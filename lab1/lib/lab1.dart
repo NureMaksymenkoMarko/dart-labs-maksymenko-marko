@@ -46,12 +46,20 @@ String formatDate(DateTime d) => '${d.year.toString().padLeft(4, '0')}-${d.month
 /// Перевіряє інваріанти рецепта та повертає всі порушення.
 List<String> validateRecipe(Recipe r) {
   final errors = <String>[];
-  if (r.title.isEmpty || r.cuisine.isEmpty) errors.add('порожня назва або кухня');
-  if (r.minutes < 1 || r.minutes > maxMinutes) errors.add('час поза діапазоном');
+  if (r.title.isEmpty || r.cuisine.isEmpty) {
+    errors.add('порожня назва або кухня');
+  }
+  if (r.minutes < 1 || r.minutes > maxMinutes) {
+    errors.add('час поза діапазоном');
+  }
   if (!difficulties.contains(r.difficulty)) errors.add('некоректна складність');
-  if (r.ingredients.isEmpty) errors.add('немає інгредієнтів');
+  if (r.ingredients.isEmpty) {
+    errors.add('немає інгредієнтів');
+  }
   for (final i in r.ingredients) {
-    if (i.quantity <= 0 || i.quantity > 10000) errors.add('некоректна кількість');
+    if (i.quantity <= 0 || i.quantity > 10000) {
+      errors.add('некоректна кількість');
+    }
     if (!units.contains(i.unit)) errors.add('некоректна одиниця');
   }
   if (r.date.isAfter(DateTime.now())) errors.add('дата у майбутньому');
@@ -61,10 +69,14 @@ List<String> validateRecipe(Recipe r) {
 /// Розбирає рядок [line] без винятків для очікуваних помилок.
 ParseResult parseRecipe(String line) {
   final fields = line.split(';');
-  if (fields.length != 6) return (recipe: null, errors: ['очікується шість полів']);
+  if (fields.length != 6) {
+    return (recipe: null, errors: ['очікується шість полів']);
+  }
   final errors = <String>[];
   final minutes = int.tryParse(fields[2]);
-  if (minutes == null) errors.add('час не є числом');
+  if (minutes == null) {
+    errors.add('час не є числом');
+  }
   final date = DateTime.tryParse(fields[5]);
   if (!_datePattern.hasMatch(fields[5]) || date == null ||
       formatDate(date) != fields[5]) {
@@ -158,14 +170,22 @@ List<Recipe> sortByTitle(Iterable<Recipe> items, {bool ascending = true}) {
 /// Пошук рецепта за назвою без StateError.
 Recipe? findByTitle(Iterable<Recipe> items, String title) {
   for (final r in items) {
-    if (r.title == title) return r;
+    if (r.title == title) {
+      return r;
+    }
   }
   return null;
 }
 
 /// Приховує числа у списку інгредієнтів через replaceAllMapped.
 String maskAmounts(String text) => text.replaceAllMapped(
-  _mask, (m) => "${m.namedGroup('name')}:***${m.namedGroup('unit')}",
+  _mask,
+  (match) {
+    if (match is RegExpMatch) {
+      return "${match.namedGroup('name')}:***${match.namedGroup('unit')}";
+    }
+    return match.group(0) ?? '';
+  },
 );
 
 /// Вік запису у повних днях із DateTime.difference.
