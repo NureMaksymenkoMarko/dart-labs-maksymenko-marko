@@ -52,7 +52,9 @@ List<String> validateRecipe(Recipe r) {
   if (r.minutes < 1 || r.minutes > maxMinutes) {
     errors.add('час поза діапазоном');
   }
-  if (!difficulties.contains(r.difficulty)) errors.add('некоректна складність');
+  if (!difficulties.contains(r.difficulty)) {
+    errors.add('некоректна складність');
+  }
   if (r.ingredients.isEmpty) {
     errors.add('немає інгредієнтів');
   }
@@ -60,9 +62,13 @@ List<String> validateRecipe(Recipe r) {
     if (i.quantity <= 0 || i.quantity > 10000) {
       errors.add('некоректна кількість');
     }
-    if (!units.contains(i.unit)) errors.add('некоректна одиниця');
+    if (!units.contains(i.unit)) {
+      errors.add('некоректна одиниця');
+    }
   }
-  if (r.date.isAfter(DateTime.now())) errors.add('дата у майбутньому');
+  if (r.date.isAfter(DateTime.now())) {
+    errors.add('дата у майбутньому');
+  }
   return errors;
 }
 
