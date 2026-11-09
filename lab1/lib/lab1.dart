@@ -41,7 +41,7 @@ const List<String> sourceLines = [
 ];
 
 /// Перетворює дату на канонічний рядок YYYY-MM-DD.
-String formatDate(DateTime d) => '\${d.year.toString().padLeft(4, '0')}-\${d.month.toString().padLeft(2, '0')}-\${d.day.toString().padLeft(2, '0')}';
+String formatDate(DateTime d) => '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
 /// Перевіряє інваріанти рецепта та повертає всі порушення.
 List<String> validateRecipe(Recipe r) {
@@ -67,7 +67,7 @@ ParseResult parseRecipe(String line) {
   if (minutes == null) errors.add('час не є числом');
   final date = DateTime.tryParse(fields[5]);
   if (!_datePattern.hasMatch(fields[5]) || date == null ||
-      (date != null && formatDate(date) != fields[5])) {
+      formatDate(date) != fields[5]) {
     errors.add('некоректна дата');
   }
   final ingredients = <Ingredient>[];
@@ -165,7 +165,7 @@ Recipe? findByTitle(Iterable<Recipe> items, String title) {
 
 /// Приховує числа у списку інгредієнтів через replaceAllMapped.
 String maskAmounts(String text) => text.replaceAllMapped(
-  _mask, (m) => "\${m.namedGroup('name')}:***\${m.namedGroup('unit')}",
+  _mask, (m) => "${m.namedGroup('name')}:***${m.namedGroup('unit')}",
 );
 
 /// Вік запису у повних днях із DateTime.difference.
@@ -180,17 +180,17 @@ String buildReport(Iterable<Recipe> items, {
   final data = items.toList();
   final buffer = StringBuffer()
     ..writeln('ЗВІТ ПРО РЕЦЕПТИ')
-    ..writeln('Записів: \${data.length}')
-    ..writeln('Сумарний час: \${totalMinutes(data)} хв')
-    ..writeln('Середній час: \${averageMinutes(data).toStringAsFixed(1)} хв')
-    ..writeln('Швидких: \${quickRecipes(data).length}')
+    ..writeln('Записів: ${data.length}')
+    ..writeln('Сумарний час: ${totalMinutes(data)} хв')
+    ..writeln('Середній час: ${averageMinutes(data).toStringAsFixed(1)} хв')
+    ..writeln('Швидких: ${quickRecipes(data).length}')
     ..writeln('Середній час за кухнями:');
   for (final entry in cuisineAverages(data).entries) {
-    buffer.writeln('  \${entry.key}: \${entry.value.toStringAsFixed(1)} хв');
+    buffer.writeln('  ${entry.key}: ${entry.value.toStringAsFixed(1)} хв');
   }
   buffer.writeln('Рецепти за тривалістю:');
   for (final r in sortByDuration(data, ascending: ascending).take(topCount)) {
-    buffer.writeln('\${r.title}$separator\${r.minutes} хв$separator\${r.cuisine}$separator\${ageDays(r, now: now)} днів');
+    buffer.writeln('${r.title}$separator${r.minutes} хв$separator${r.cuisine}$separator${ageDays(r, now: now)} днів');
   }
   return buffer.toString();
 }
